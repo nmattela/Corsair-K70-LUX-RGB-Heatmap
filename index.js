@@ -38,21 +38,31 @@ function HSVtoRGB(h, s, v) {
     };
 }
 
+const connectClient = async () => {
+    try {
+        const client = new OpenRGBClient({
+            host: 'localhost',
+            port: 6742,
+            name: "Heatmap"
+        });
+        await client.connect();
+        return client
+    } catch (e) {
+        return await connectClient()
+    }
+}
+
 const main = async () => {
-    const client = new OpenRGBClient({
-        host: 'localhost',
-        port: 6742,
-        name: "Heatmap"
-    });
 
     const config = JSON.parse(fs.readFileSync('./config.json'));
 
-    await client.connect();
+    const client = await connectClient();
     const controllerCount = await client.getControllerCount();
 
     let k70;
     for(let deviceId = 0; deviceId < controllerCount; deviceId++) {
         const device = await client.getDeviceController(deviceId);
+        console.log(device)
         if(device.name === 'Corsair K70 LUX RGB') {
             k70 = device
         }
