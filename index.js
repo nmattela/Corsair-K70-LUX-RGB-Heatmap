@@ -89,16 +89,17 @@ const main = async () => {
                     }]
                 )
         );
-        ioHook.on("keydown", async event => {
+        ioHook.on("keyup", async event => {
             const key = keys[event.keycode];
             if(key) {
                 key.presses++;
                 const keyPresses = Object.values(keys)
                     .sort((a, b) => a.index < b.index ? -1 : 1)
                     .map((value) => value.presses);
+                const totalPresses = keyPresses.reduce((acc, val) => acc + val);
                 const maxPresses = keyPresses.reduce((a, b) => Math.max(a, b));
                 const newRGBs = keyPresses
-                    .map(presses => HSVtoRGB(((presses / maxPresses) * (30/36)), 1, 1));
+                    .map(presses => HSVtoRGB(((presses / totalPresses) * (30/36)), 1, 1));
                 await client.updateLeds(k70, newRGBs)
             }
         });
